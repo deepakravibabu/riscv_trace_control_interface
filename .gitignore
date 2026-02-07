@@ -1,0 +1,47 @@
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+
+# ---- VS Code ----
+.vscode/*
+.vscode/extensions.json
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+
+# ---- Build dirs ----
+build/
+cmake-build-*/
+out/
+bin/
+lib/
+
+# ---- CMake ----
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# ---- Compiled objects / binaries ----
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.elf
+*.map
+*.hex
+*.bin
+
+# ---- Debug / profiling ----
+*.dSYM/
+*.log
+gmon.out
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
