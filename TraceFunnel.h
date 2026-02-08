@@ -5,44 +5,73 @@
 #include <cstddef>
 
 #include "TraceBytesConnect.h"
+#include "IMmioDevice.h"
 
-class TraceFunnel : public TraceBytesConnect {
-    public:
+static constexpr uint32_t TR_FUNNEL_CONTROL = 0x00;
+static constexpr uint32_t TR_FUNNEL_DIS_INPUT = 0x04;
+
+class TraceFunnel : public TraceBytesConnect, public IMmioDevice {
+public:
     TraceFunnel() {
-        std::cout << "[TraceFunnel] constructor called" << std::endl;
+        // std::cout << "[TraceFunnel] constructor called" << std::endl;
     }
 
     ~TraceFunnel() {
-        std::cout << "[TraceFunnel] destructor called" << std::endl;
+        // std::cout << "[TraceFunnel] destructor called" << std::endl;
     }
-    
+
     void connect(TraceBytesConnect* connector) {
-        traceByteConnector = connector;
+        out = connector;
     }
 
     void pushBytes(const std::uint8_t* data, std::size_t length) override {
-        std::cout << "[TraceFunnel::pushBytes] pushBytes method called" << std::endl;
-        if(trFunnelControl != 1) {
+        if((trFunnelControl & 0x1u) == 0) {
             std::cout << "[TraceFunnel::pushBytes] Trace funneling is disabled" << std::endl;
             return;
         }
-        if (traceByteConnector) {
+        if (out) {
             std::cout << "[TraceFunnel::pushBytes] Pushing bytes to connector" << std::endl;
-            traceByteConnector->pushBytes(data, length);
+            out->pushBytes(data, length);
         } else {
-            std::cout << "[TraceFunnel::pushBytes] No traceByteConnector set" << std::endl;
+            std::cout << "[TraceFunnel::pushBytes] No out set" << std::endl;
         }
     }
 
     void set_funnelControl(uint32_t control) {
         trFunnelControl = control;
     }
-    
-    private:
-        TraceBytesConnect* traceByteConnector = nullptr;
 
-        std::uint32_t trFunnelControl = 1; // enable = 1 (default)
-        std::uint32_t trFunnelDisInput = 0;
+    std::uint32_t read32(std::uint32_t offset) override {
+        switch (offset) {
+            case TR_FUNNEL_CONTROL:
+                return trFunnelControl;
+            case TR_FUNNEL_DIS_INPUT:
+                return trFunnelDisInput;
+            default:
+                std::cout << "[TraceFunnel::read32] Invalid offset: " << offset << std::endl;
+                return 0;
+        }
+    }
+
+    void write32(std::uint32_t offset, std::uint32_t value) override {
+        switch (offset) {
+            case TR_FUNNEL_CONTROL:
+                trFunnelControl = value;
+                break;
+            case TR_FUNNEL_DIS_INPUT:
+                trFunnelDisInput = value;
+                break;
+            default:
+                std::cout << "[TraceFunnel::write32] Invalid offset: " << offset << std::endl;
+                break;
+        }
+    }
+    
+private:
+    TraceBytesConnect* out = nullptr;
+
+    std::uint32_t trFunnelControl = 0; // enable = 0 (default)
+    std::uint32_t trFunnelDisInput = 0;
 
 };
 

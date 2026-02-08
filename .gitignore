@@ -45,3 +45,15 @@ gmon.out
 __pycache__/
 *.pyc
 .venv/
+
+# ---- Misc ---- (Debug symbols, linker files, user-specific IDE files)
+*.ilk
+*.pdb
+*.suo
+
+# ---- Ignore specific files ----
+# drawio files
+*.drawio
+*.bkp
+*.drawio.bkp
+*.drawio.dtmp

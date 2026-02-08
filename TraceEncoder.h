@@ -5,29 +5,32 @@
 #include <cstdint>
 
 #include "TraceBytesConnect.h"
+#include "IMmioDevice.h"
 
-class TraceEncoder {
-    public:
+static constexpr uint32_t TR_TE_CONTROL = 0x00;
+
+class TraceEncoder : public IMmioDevice{
+public:
     TraceEncoder() {
-        std::cout << "[TraceEncoder] constructor called" << std::endl;
+        // std::cout << "[TraceEncoder] constructor called" << std::endl;
     }
-    
+
     ~TraceEncoder() {
-        std::cout << "[TraceEncoder] destructor called" << std::endl;
+        // std::cout << "[TraceEncoder] destructor called" << std::endl;
     }
 
     void connect(TraceBytesConnect* connector) {
-        traceByteConnector = connector;
+        out = connector;
     }
-    
+
     void emitInstr(){
-        if(trTeControl != 1) {
+        if((trTeControl & 0x1u) == 0) {
             std::cout << "[TraceEncoder::emitInstr] Trace encoding is disabled" << std::endl;
             return;
         }
 
-        if (!traceByteConnector) {
-            std::cout << "[TraceEncoder::emitInstr] No traceByteConnector set" << std::endl;
+        if (!out) {
+            std::cout << "[TraceEncoder::emitInstr] No out set" << std::endl;
             return;
         }
 
@@ -36,27 +39,48 @@ class TraceEncoder {
         append_u32_le(buffer, pcInstr[0]); // pc
         append_u32_le(buffer, pcInstr[1]); // opcode
         
-        std::cout << "buffer filled with pc and opcode" << std::endl;
+        std::cout << "[TraceEncoder::emitInstr] buffer filled with pc and opcode" << std::endl;
 
-        traceByteConnector->pushBytes(buffer);
+        out->pushBytes(buffer);
     }
 
     void set_teControl(uint32_t control) {
         trTeControl = control;
     }
-    
-    private:
-        std::vector<uint32_t> pcInstr = {0x1000, 0xDEADBEEF}; // {pc, opcode}
 
-        TraceBytesConnect* traceByteConnector = nullptr;
-        std::uint32_t trTeControl = 1; // enable = 1 (default)
-
-    private:
-        static void append_u32_le(std::vector<uint8_t>& buffer, uint32_t value) {
-            buffer.push_back(value & 0xFF);
-            buffer.push_back((value >> 8) & 0xFF);
-            buffer.push_back((value >> 16) & 0xFF);
-            buffer.push_back((value >> 24) & 0xFF);
+    std::uint32_t read32(std::uint32_t offset) override {
+        switch (offset) {
+            case TR_TE_CONTROL:
+                return trTeControl;
+            default:
+                std::cout << "[TraceEncoder::read32] Invalid offset: " << offset << std::endl;
+                return 0;
         }
+    }
+
+    void write32(uint32_t offset, uint32_t value) override {
+        switch (offset) {
+            case TR_TE_CONTROL:
+                trTeControl = value;
+                break;
+            default:
+                std::cout << "[TraceEncoder::write32] Invalid offset: " << offset << std::endl;
+        }
+    }
+
+
+private:
+    std::vector<uint32_t> pcInstr = {0x1000, 0xDEADBEEF}; // {pc, opcode}
+
+    TraceBytesConnect* out = nullptr;
+    std::uint32_t trTeControl = 0; // enable = 0 (default)
+
+private:
+    static void append_u32_le(std::vector<uint8_t>& buffer, uint32_t value) {
+        buffer.push_back(static_cast<std::uint8_t>(value & 0xFF));
+        buffer.push_back(static_cast<std::uint8_t>((value >> 8) & 0xFF));
+        buffer.push_back(static_cast<std::uint8_t>((value >> 16) & 0xFF));
+        buffer.push_back(static_cast<std::uint8_t>((value >> 24) & 0xFF));
+    }
 
 };

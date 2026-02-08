@@ -1,0 +1,2 @@
+1. Use shared_ptr for memory management
+2. Can lambda functions be used?
