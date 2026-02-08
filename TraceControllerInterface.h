@@ -65,12 +65,3 @@ namespace tci {
     }
     
 }
-
-// for (std::size_t i = 0; i < nbytes; i += 4) {
-//     uint32_t value = mmioBus.read32(trRamSinkBase + TR_RAM_DATA);
-//     // Append the 4 bytes of value to data vector in little-endian order
-//     data.push_back(value & 0xFF);
-//     if (data.size() < nbytes) data.push_back((value >> 8) & 0xFF);
-//     if (data.size() < nbytes) data.push_back((value >> 16) & 0xFF);
-//     if (data.size() < nbytes) data.push_back((value >> 24) & 0xFF);
-// }

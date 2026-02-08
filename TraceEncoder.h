@@ -8,7 +8,6 @@
 #include "IMmioDevice.h"
 #include "TraceControlRegisters.h"
 
-// static constexpr uint32_t TR_TE_CONTROL = 0x00;
 
 namespace tci {
     class TraceEncoder : public IMmioDevice{

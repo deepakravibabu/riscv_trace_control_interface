@@ -8,8 +8,7 @@
 #include "IMmioDevice.h"
 #include "TraceControlRegisters.h"
 
-// static constexpr uint32_t TR_FUNNEL_CONTROL = 0x00;
-// static constexpr uint32_t TR_FUNNEL_DIS_INPUT = 0x04;
+
 namespace tci {
     class TraceFunnel : public TraceBytesConnect, public IMmioDevice {
             public:

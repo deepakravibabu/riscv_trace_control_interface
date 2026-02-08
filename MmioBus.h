@@ -5,7 +5,6 @@
 #include "IMmioDevice.h"
 
 namespace tci {
-
     struct MmioMapping {
         uint32_t baseAddress;
         uint32_t size;
@@ -36,17 +35,8 @@ namespace tci {
             }
             throw std::out_of_range("MMIO write out of range");
         }
-        
+
         private:
-        // std::pair<IMmioDevice*, uint32_t> findDevice(uint32_t address) {
-            //     for (const auto& mapping : mappings) {
-                //         if (address >= mapping.baseAddress && address < mapping.baseAddress + mapping.size) {
-                    //             return {mapping.device, address - mapping.baseAddress};
-                    //         }
-                    //     }
-                    //     throw std::out_of_range("MMIO access out of range");
-                    // }
-                    private:
-                    std::vector<MmioMapping> mappings;
+        std::vector<MmioMapping> mappings;
     };
 }

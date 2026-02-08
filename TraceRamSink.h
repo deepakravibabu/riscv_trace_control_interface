@@ -7,10 +7,6 @@
 #include "IMmioDevice.h"
 #include "TraceControlRegisters.h"
 
-// static constexpr uint32_t TR_RAM_CONTROL = 0x00;
-// static constexpr uint32_t TR_RAM_WP_LOW = 0x04;
-// static constexpr uint32_t TR_RAM_RP_LOW = 0x08;
-// static constexpr uint32_t TR_RAM_DATA = 0x0C;
 
 namespace tci {
     class TraceRamSink : public TraceBytesConnect, public IMmioDevice {
