@@ -5,6 +5,14 @@
 
 #include <iostream>
 
+/*
+    If CMake is used then the project can be built with the following command. 
+    <PowerShell terminal>
+        PS D:\Project\riscv_trace_control_interface\build> cmake -S .. -B .
+        MSBuild.exe .\tci.vcxproj
+    It builds the project and the .exe file is found under ./Debug/tci.exe
+*/
+
 int main() {
     TraceEncoder encoder;
     TraceFunnel funnel;

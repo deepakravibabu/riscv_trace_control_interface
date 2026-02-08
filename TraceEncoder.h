@@ -70,7 +70,7 @@ public:
 
 
 private:
-    std::vector<uint32_t> pcInstr = {0x1000, 0xDEADBEEF}; // {pc, opcode}
+    std::vector<uint32_t> pcInstr = {0x2000, 0xDEADBEEF}; // {pc, opcode}
 
     TraceBytesConnect* out = nullptr;
     std::uint32_t trTeControl = 0; // enable = 0 (default)
