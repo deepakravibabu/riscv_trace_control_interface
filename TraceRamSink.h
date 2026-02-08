@@ -13,7 +13,7 @@ static constexpr uint32_t TR_RAM_DATA = 0x0C;
 
 class TraceRamSink : public TraceBytesConnect, public IMmioDevice {
 public:
-    TraceRamSink() {
+    TraceRamSink(std::size_t bufferSize = 16) : dataBuffer(bufferSize, 0) {
         // std::cout << "[TraceSink] constructor called" << std::endl;
     }
     
@@ -27,7 +27,15 @@ public:
             return;
         }
         for (std::size_t i = 0; i < length; ++i) {
-            dataBuffer.push_back(data[i]);
+            // dataBuffer.push_back(data[i]);
+            if(count == dataBuffer.size()) {
+                overflow = true;
+                std::cout << "[TraceRamSink::pushBytes] Data buffer overflow, cannot push more bytes" << std::endl;
+                return;
+            }
+            dataBuffer[trRamWPLow] = data[i];
+            trRamWPLow = (trRamWPLow + 1) % dataBuffer.size();
+            count++;
         }   
     }
 
@@ -48,7 +56,7 @@ public:
             case TR_RAM_RP_LOW:
                 return trRamRPLow;
             case TR_RAM_DATA:
-                return trRamData;
+                return pop_u32_le();
             default:
                 std::cout << "[TraceRamSink::read32] Invalid offset: " << offset << std::endl;
                 return 0;
@@ -58,16 +66,24 @@ public:
     void write32(std::uint32_t offset, std::uint32_t value) override {
         switch (offset) {
             case TR_RAM_CONTROL:
-                trRamControl = value;
+                if(value == 0) {
+                    trRamControl = value;
+                    resetDataBuffer();
+                } else if (value == 1) {
+                    trRamControl = value;                    
+                } else {
+                    std::cout << "[TraceRamSink::write32] Invalid control value: " << value << std::endl;
+                    return;
+                }
                 break;
             case TR_RAM_WP_LOW:
-                trRamWPLow = value;
+                // trRamWPLow = value; // ignore writes to WP_LOW
                 break;
             case TR_RAM_RP_LOW:
-                trRamRPLow = value;
+                // trRamRPLow = value; // ignore writes to RP_LOW
                 break;
             case TR_RAM_DATA:
-                trRamData = value;
+                // trRamData = value; // ignore writes to DATA
                 break;
             default:
                 std::cout << "[TraceRamSink::write32] Invalid offset: " << offset << std::endl;
@@ -76,12 +92,36 @@ public:
     }
 
 private:
-    std::vector<std::uint8_t> dataBuffer;
+    uint32_t pop_u32_le() {
+        if(count < 4) {
+            std::cout << "[TraceRamSink::pop_u32_le] Not enough data to pop a uint32_t" << std::endl;
+            return 0;
+        }
+        uint32_t value = 0;
+        for(int i = 0; i < 4; ++i) {
+            value |= (dataBuffer[trRamRPLow] << (8 * i));
+            trRamRPLow = (trRamRPLow + 1) % dataBuffer.size();
+            count--;
+        }
+        return value;
+    }
 
+    void resetDataBuffer() {
+        std::fill(dataBuffer.begin(), dataBuffer.end(), 0); // Clear the buffer
+        trRamWPLow = 0;
+        trRamRPLow = 0;
+        count = 0;
+        overflow = false;
+    }
+
+private:
     std::uint32_t trRamControl = 0; // enable = 0 (default)
+    std::vector<std::uint8_t> dataBuffer;
     std::uint32_t trRamWPLow = 0; 
     std::uint32_t trRamRPLow = 0; 
     std::uint32_t trRamData = 0;
+    std::uint32_t count = 0;
+    bool overflow = false;
 
 };
 

@@ -1,2 +1,6 @@
 1. Use shared_ptr for memory management
 2. Can lambda functions be used?
+3. Should volatile be used?
+    static constexpr uint32_t TR_TE_CONTROL = 0x00;
+    static constexpr volatile uint32_t TR_TE_CONTROL = 0x00;
+
