@@ -1,6 +1,22 @@
+Step 1: Spec-aligned register definitions (offsets + bitfields) for TE/TF/TRS
+
+ Step 2: Read-modify-write helpers for control regs (set/clear/mask fields)
+
+ Step 3: Driver-style APIs per component (Encoder/Funnel/RamSink) using only ReadMemory/WriteMemory
+
+ Step 4: Controller/tool abstraction that sequences Configure → Start → Stop → Fetch correctly
+
+ Step 5: Lightweight simulation: generate some trace words + verify fetch works
+
+ Step 6: Test/demo app that exercises the API + comments explaining assumptions
+
+
 1. Use shared_ptr for memory management
 2. Can lambda functions be used?
-3. Should volatile be used?
+3. Should volatile be used? -> not a real hardware so not valid since here we invoke a func call only NOT a h/w reg read 
     static constexpr uint32_t TR_TE_CONTROL = 0x00;
     static constexpr volatile uint32_t TR_TE_CONTROL = 0x00;
+4. should we have to pass TR_TE_BASE, TR_FUNNEL_BASE, TR_RAM_SINK_BASE from tci to trace system during initialization in main()?
+    - can we directly specify them inside TraceSystem.hardware
 
+5. 

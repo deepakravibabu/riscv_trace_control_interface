@@ -1,5 +1,5 @@
 /*
-    With CMake, the project can be built with the following command. 
+    With VSCode, if you like to use CMake, the project can be built with the following command. 
     <PowerShell terminal>
         PS D:\Project\riscv_trace_control_interface\build> cmake -S .. -B .
         MSBuild.exe .\tci.vcxproj

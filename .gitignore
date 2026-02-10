@@ -8,6 +8,7 @@ Thumbs.db
 .vscode/settings.json
 .vscode/tasks.json
 .vscode/launch.json
+.code-workspace
 
 # ---- Build dirs ----
 build/
