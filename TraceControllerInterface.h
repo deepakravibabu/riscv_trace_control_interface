@@ -30,20 +30,32 @@ namespace tci {
         else assert((got & mask) == 0);
     }
 
+    static inline uint32_t bitFieldGet(uint32_t reg, uint32_t mask, uint32_t shift) {
+        return (reg & mask) >> shift;
+    }
+    static inline uint32_t bitFieldSet(uint32_t reg, uint32_t mask, uint32_t shift, uint32_t v) {
+        reg &= ~mask;
+        reg |= (v << shift) & mask;
+        return reg;
+    }
+
+
     void TraceControllerInterface::configure() {
         // Enable TraceEncoder
         // mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, 1);
         // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
-        uint32_t teControlValue = tci::tr_te::TR_TE_ACTIVE | tci::tr_te::TR_TE_ENABLE | tci::tr_te::TR_TE_INST_TRACING;
+        uint32_t teControlValue = tci::tr_te::TR_TE_ACTIVE | tci::tr_te::TR_TE_ENABLE | tci::tr_te::TR_TE_INST_TRACING
+            | (0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK;
         mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, teControlValue);
+
         // Assertions to check the write
         uint32_t readBackValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
         expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
         expectBits(readBackValue, tci::tr_te::TR_TE_ENABLE, true);
-        
+        // Assertion
+        uint32_t readBackFormat = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
 
-        uint32_t teControlFormat = (0x2u) & tci::tr_te::TR_TE_FORMAT_MASK; // 0 E-trace, 1 N-Trace
-        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, teControlFormat);
 
         // Enable TraceFunnel
         mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 1);

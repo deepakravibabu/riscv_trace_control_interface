@@ -78,15 +78,16 @@ namespace tci {
                 }
 
                 // Normal masked write 
-                // - keep RO bits
-                // - take RW bits from incoming value
+                // Keep RO bits(EMPTY) as oldValue
                 const std::uint32_t keep_ro = oldValue & tci::tr_te::TR_TE_CONTROL_RO_MASK;
+                
+                // Take RW bits(ACTIVE, ENABLE, INST_TRACING, FORMAT) from new value
                 std::uint32_t new_rw  = value & tci::tr_te::TR_TE_CONTROL_RW_MASK;
 
                 // multi-bit fields write
-                // new_rw = normalize_warl_fields(new_rw);
+                new_rw = normalize_warl_fields(new_rw);
 
-                // register value updated
+                // register value updated (keep old + update only new)
                 trTeControl = keep_ro | new_rw;
 
                 // 3) RW1C behavior: trTeInstStallOrOverflow clears when software writes 1
