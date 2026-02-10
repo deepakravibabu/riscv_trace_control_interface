@@ -13,9 +13,12 @@
 #include <vector>
 #include <cstdint>
 
+using namespace tci;
+
 int main(){
     TraceSystem trSystem;
-    tci::TraceControllerInterface trController(trSystem.mmioBus, TraceSystem::TR_TE_BASE, TraceSystem::TR_FUNNEL_BASE, TraceSystem::TR_RAM_SINK_BASE);
+    tci::TraceControllerInterface trController(trSystem.mmioBus, TraceSystem::TR_TE_BASE, 
+        TraceSystem::TR_FUNNEL_BASE, TraceSystem::TR_RAM_SINK_BASE);
 
     trController.configure();
     trController.start();

@@ -29,10 +29,10 @@ namespace tci {
         // Masks for write behavior 
         // (only bits in CONTROL_RW_MASK can be written, bits in CONTROL_RO_MASK are read-only status bits that may be updated by the TraceEncoder's internal logic)
         static constexpr uint32_t TR_TE_CONTROL_RW_MASK =
-            TR_TE_ACTIVE | TR_TE_ENABLE | TR_TE_CONTEXT | TR_TE_INST_TRIG_ENABLE | TR_TE_INST_STALL_ENA | TR_TE_INHIBIT_SRC |
+            TR_TE_ACTIVE | TR_TE_ENABLE | TR_TE_INST_TRACING | TR_TE_CONTEXT | TR_TE_INST_TRIG_ENABLE | TR_TE_INST_STALL_ENA | TR_TE_INHIBIT_SRC | TR_TE_INST_STALL_OR_OVERFLOW |
             TR_TE_INST_MODE_MASK | TR_TE_INST_SYNC_MODE_MASK | TR_TE_INST_SYNC_MAX_MASK | TR_TE_FORMAT_MASK;
         static constexpr uint32_t TR_TE_CONTROL_RO_MASK =
-            TR_TE_EMPTY | TR_TE_INST_TRACING | TR_TE_INST_STALL_OR_OVERFLOW; // if you model them as RO status
+            TR_TE_EMPTY ; // if you model them as RO status
     }
     
     // TraceFunnel control register offsets

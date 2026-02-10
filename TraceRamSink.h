@@ -47,13 +47,13 @@ namespace tci {
 
         std::uint32_t read32(std::uint32_t offset) override {
             switch (offset) {
-                case TR_RAM_CONTROL:
+                case tci::tr_ram::TR_RAM_CONTROL:
                     return trRamControl;
-                case TR_RAM_WP_LOW:
+                case tci::tr_ram::TR_RAM_WP_LOW:
                     return trRamWPLow;
-                case TR_RAM_RP_LOW:
+                case tci::tr_ram::TR_RAM_RP_LOW:
                     return trRamRPLow;
-                case TR_RAM_DATA:
+                case tci::tr_ram::TR_RAM_DATA:
                     return pop_u32_le();
                 default:
                     std::cout << "[TraceRamSink::read32] Invalid offset: " << offset << std::endl;
@@ -63,7 +63,7 @@ namespace tci {
 
         void write32(std::uint32_t offset, std::uint32_t value) override {
             switch (offset) {
-                case TR_RAM_CONTROL:
+                case tci::tr_ram::TR_RAM_CONTROL:
                     if(value == 0) {
                         trRamControl = value;
                         resetDataBuffer();
@@ -74,13 +74,13 @@ namespace tci {
                         return;
                     }
                     break;
-                case TR_RAM_WP_LOW:
+                case tci::tr_ram::TR_RAM_WP_LOW:
                     // trRamWPLow = value; // ignore writes to WP_LOW
                     break;
-                case TR_RAM_RP_LOW:
+                case tci::tr_ram::TR_RAM_RP_LOW:
                     // trRamRPLow = value; // ignore writes to RP_LOW
                     break;
-                case TR_RAM_DATA:
+                case tci::tr_ram::TR_RAM_DATA:
                     // trRamData = value; // ignore writes to DATA
                     break;
                 default:

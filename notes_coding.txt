@@ -10,6 +10,8 @@ Step 1: Spec-aligned register definitions (offsets + bitfields) for TE/TF/TRS
 
  Step 6: Test/demo app that exercises the API + comments explaining assumptions
 
+ Step 7: Assertions to validate
+
 
 1. Use shared_ptr for memory management
 2. Can lambda functions be used?
@@ -19,4 +21,21 @@ Step 1: Spec-aligned register definitions (offsets + bitfields) for TE/TF/TRS
 4. should we have to pass TR_TE_BASE, TR_FUNNEL_BASE, TR_RAM_SINK_BASE from tci to trace system during initialization in main()?
     - can we directly specify them inside TraceSystem.hardware
 
-5. 
+5.  
+
+
+Config:
+    TraceEncoder
+        1. trTeActive -> TR_TE_CONTROL[0]   = 0 (reset/power down) (other regs inaccessible)
+                                            = 1 (active) (write 1 and read back to see if it is 1 then, start config)
+
+        2. trTeEnable -> TR_TE_CONTROL[1]   = 0 (flushes buffer downstream)
+                                            = 1 (enable) (MUST Be set last after choosing other settings e.g., trTeInstTracing, trTeInstMode)
+        
+        3. trTeInstTracing -> TR_TE_CONTROL[2]  = 0 
+                                                = 1 (start tracing) (MUST be set after trTeEnable; this is the last bit to start pushing traces downstream)
+
+        4. Starts emiting traces
+
+        5. Not modeled:
+            - if downstream stream is already full. Set overflow bit.
