@@ -30,20 +30,15 @@ namespace tci {
     
     // Driver API:
     
-    void configure() {
-        // Configure trEncoderControl:
-        // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
-        // since we configure, direct write without read
-        uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE |  tci::tr_te::TR_TE_INST_TRACING | ((0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK);
-        hw_.WriteMemory(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
-
+    void configure() {        
+        // Configure trRamControl:
+        uint32_t trRamControlValue = tci::tr_ram::TR_RAM_ACTIVE | tci::tr_ram::TR_RAM_ENABLE;
+        hw_.WriteMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, trRamControlValue);
         // Assertions to check the write
-        uint32_t readBackValue = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
-        expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
-        expectBits(readBackValue, tci::tr_te::TR_TE_INST_TRACING, true);
-        uint32_t readBackFormat = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
-        assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
-        // std::cout << "[TraceControllerInterface::configure] TraceEncoder configured with Active, InstTracing enabled and Format set to 0x5" << std::endl;
+        uint32_t ramReadBackValue = hw_.ReadMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
+        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ACTIVE, true);
+        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ENABLE, true);
+        // std::cout << "[TraceControllerInterface::configure] TraceRamSink configured with Active and Enable set" << std::endl;
         
         // Configure trFunnelControl:
         uint32_t trFunnelControlValue = tci::tr_tf::TR_FUNNEL_ACTIVE | tci::tr_tf::TR_FUNNEL_ENABLE;
@@ -63,14 +58,18 @@ namespace tci {
         // std::cout << "[TraceControllerInterface::configure] TraceFunnel input enabled (trFunnelDisInput set to 0)" << std::endl;
         
 
-        // Configure trRamControl:
-        uint32_t trRamControlValue = tci::tr_ram::TR_RAM_ACTIVE | tci::tr_ram::TR_RAM_ENABLE;
-        hw_.WriteMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, trRamControlValue);
+        // Configure trEncoderControl:
+        // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
+        // since we configure, direct write without read
+        uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE |  tci::tr_te::TR_TE_INST_TRACING | ((0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK);
+        hw_.WriteMemory(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
         // Assertions to check the write
-        uint32_t ramReadBackValue = hw_.ReadMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
-        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ACTIVE, true);
-        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ENABLE, true);
-        // std::cout << "[TraceControllerInterface::configure] TraceRamSink configured with Active and Enable set" << std::endl;
+        uint32_t readBackValue = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
+        expectBits(readBackValue, tci::tr_te::TR_TE_INST_TRACING, true);
+        uint32_t readBackFormat = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
+        // std::cout << "[TraceControllerInterface::configure] TraceEncoder configured with Active, InstTracing enabled and Format set to 0x5" << std::endl;
 
     }
     
