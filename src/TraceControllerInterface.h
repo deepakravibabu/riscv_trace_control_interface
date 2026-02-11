@@ -34,6 +34,7 @@ namespace tci {
         // Configure trEncoderControl:
         // mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, 1);
         // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
+        // since we configure, direct write without read
         uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE |  tci::tr_te::TR_TE_INST_TRACING | ((0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK);
         mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
         // Assertions to check the write

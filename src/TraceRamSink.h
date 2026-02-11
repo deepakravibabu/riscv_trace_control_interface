@@ -105,7 +105,7 @@ namespace tci {
             case tci::tr_ram::TR_RAM_RP_LOW:
                 // - SW may advance RP forward to consume data without reading DATA.
                 // - Backward moves are ignored (ambiguous).
-                apply_rp_write_forward_only(value);
+                // apply_rp_write_forward_only(value);
                 break;
             case tci::tr_ram::TR_RAM_DATA:
                 // read-only data port // ignore writes to DATA
@@ -175,28 +175,28 @@ namespace tci {
 
     // Optional: allow software to advance RP (consume) without reading DATA.
     // Forward-only; clamps to available data.
-    void apply_rp_write_forward_only(std::uint32_t value) {
-        if (dataBuffer.empty()) return;
+    // void apply_rp_write_forward_only(std::uint32_t value) {
+    //     if (dataBuffer.empty()) return;
 
-        // Only consider aligned pointer bits [31:2]
-        std::uint32_t new_ptr = value & tci::tr_ram::TR_RAM_RP_LOW_MASK;
-        std::uint32_t new_rp = (new_ptr % static_cast<std::uint32_t>(dataBuffer.size())) & ~0x3u;
+    //     // Only consider aligned pointer bits [31:2]
+    //     std::uint32_t new_ptr = value & tci::tr_ram::TR_RAM_RP_LOW_MASK;
+    //     std::uint32_t new_rp = (new_ptr % static_cast<std::uint32_t>(dataBuffer.size())) & ~0x3u;
 
-        const std::uint32_t size = static_cast<std::uint32_t>(dataBuffer.size());
-        const std::uint32_t old_rp = rp_byte & ~0x3u;
+    //     const std::uint32_t size = static_cast<std::uint32_t>(dataBuffer.size());
+    //     const std::uint32_t old_rp = rp_byte & ~0x3u;
 
-        // forward distance in ring
-        std::uint32_t forward = 0;
-        if (new_rp >= old_rp) forward = new_rp - old_rp;
-        else forward = (size - old_rp) + new_rp;
+    //     // forward distance in ring
+    //     std::uint32_t forward = 0;
+    //     if (new_rp >= old_rp) forward = new_rp - old_rp;
+    //     else forward = (size - old_rp) + new_rp;
 
-        if (forward > count) forward = count; // cannot consume more than available
+    //     if (forward > count) forward = count; // cannot consume more than available
 
-        rp_byte = (rp_byte + forward) % size;
-        count -= forward;
+    //     rp_byte = (rp_byte + forward) % size;
+    //     count -= forward;
 
-        update_empty_from_count();
-    }
+    //     update_empty_from_count();
+    // }
 
     void resetDataBuffer() {
         std::fill(dataBuffer.begin(), dataBuffer.end(), 0); // Clear the buffer

@@ -39,7 +39,7 @@ namespace tci {
                     std::cout << "[TraceFunnel::pushBytes] Trace funneling input is disabled" << std::endl;
                     return;
                 }
-                std::cout << "[TraceFunnel::pushBytes] Pushing bytes to connector" << std::endl;
+                // std::cout << "[TraceFunnel::pushBytes] Pushing bytes to connector" << std::endl;
                 out->pushBytes(data, length);
             } else {
                 std::cout << "[TraceFunnel::pushBytes] No out set" << std::endl;

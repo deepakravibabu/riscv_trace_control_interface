@@ -47,7 +47,7 @@ namespace tci {
         // Status: once we emit something, it is not empty anymore
         trTeControl &= ~tci::tr_te::TR_TE_EMPTY;
         
-        std::cout << "[TraceEncoder::emitTrace] buffer filled with pc and opcode" << std::endl;
+        // std::cout << "[TraceEncoder::emitTrace] buffer filled with pc and opcode" << std::endl;
         
         out->pushBytes(buffer);
     }
