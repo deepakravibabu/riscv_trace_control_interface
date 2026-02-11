@@ -99,25 +99,39 @@ namespace tci {
         expectBits(readBackValue, tci::tr_te::TR_TE_ENABLE, false);
 
         // Disable TraceFunnel
-        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 0);
+        uint32_t trFunnelControlValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL) & ~tci::tr_tf::TR_FUNNEL_ENABLE;
+        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, trFunnelControlValue);
+        // Assertions to check the write
+        uint32_t funnelReadBackValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL);
+        expectBits(funnelReadBackValue, tci::tr_tf::TR_FUNNEL_ENABLE, false);
+
         // Disable TraceRamSink
-        mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, 0);
+        uint32_t trRamControlValue = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL) & ~tci::tr_ram::TR_RAM_ENABLE;
+        mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, trRamControlValue);
+        // Assertions to check the write
+        uint32_t ramReadBackValue = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
+        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ENABLE, false);
     }
     
-    std::vector<uint32_t> fetch(std::size_t nbytes) {
+    std::vector<uint32_t> fetch(std::size_t wordCount) {
         std::vector<uint32_t> data;
-        data.reserve(nbytes);
-        
-        for(;;) {
+        data.reserve(wordCount);
+
+        while(data.size() < wordCount) {
             std::uint32_t sinkRamRP = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_RP_LOW); // read RP_LOW to see how many bytes have been read
             std::uint32_t sinkRamWP = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_WP_LOW); // read WP_LOW to see how many bytes have been written
-            if ((sinkRamWP == sinkRamRP) || (data.size() >= nbytes)) break;
-            std::uint32_t sinkDataBufferValue = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_DATA); // read from TraceRamSink to see the data
-            // Append the 4 bytes of value to data vector in little-endian order
+            if ((sinkRamWP == sinkRamRP)) break; // no more data available
+            std::uint32_t sinkDataBufferValue = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_DATA); // advances rp by 4 bytes.  Read from TraceRamSink to see the data
             data.push_back(sinkDataBufferValue);
+
+            const std::uint32_t ctrl = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
+            const bool empty = (ctrl & tci::tr_ram::TR_RAM_EMPTY) != 0;
+            if(empty) break; // no more data available
         }
         return data;
     }
+
+
     private:
         MmioBus& mmioBus;
         uint32_t trTeBase; // base address for TraceEncoder

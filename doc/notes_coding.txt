@@ -1,39 +1,56 @@
-Step 1: Spec-aligned register definitions (offsets + bitfields) for TE/TF/TRS
+Modeled:
+    - Spec-aligned register definitions (offsets + bitfields) for TE/TF/TRS
 
- Step 2: Read-modify-write helpers for control regs (set/clear/mask fields)
-
- Step 3: Assertions to validate
-
- Step 4: Driver-style APIs per component (Encoder/Funnel/RamSink) using only ReadMemory/WriteMemory
-
- Step 5: Controller/tool abstraction that sequences Configure → Start → Stop → Fetch correctly
-
- Step 6: Lightweight simulation: generate some trace words + validate fetch works
-
- 
+    - Read-modify-write helpers for control regs (set/clear/mask fields)
+    
+    - Assertions to validate
+    
+    - Driver-style APIs per component (Encoder/Funnel/RamSink) using only ReadMemory/WriteMemory
+    
+    - Controller/tool abstraction that sequences Configure → Start → Stop → Fetch
+    
+    - Lightweight simulation: generate some trace words + validate fetch works
 
 TraceEncoder
-    Config():
-        1. trTeActive -> TR_TE_CONTROL[0]   = 0 (reset/power down) (other regs inaccessible)
-                                            = 1 (active) (write 1 and read back to see if it is 1 then, start config)
+    Configure():
+        TraceEncoder
+            1. trTeActive       -> TR_TE_CONTROL[0]         = 1 (active) (write 1 and read back to see if it is 1 then, start config)
+            2. trTeInstTracing  -> TR_TE_CONTROL[2]         = 1 (start tracing) (MUST be set before trTeEnable)
+        TraceFunnel
+            1. trFunnelActive   -> TR_FUNNEL_CONTROL[0]     = 1
+            2. trFunnelEnable   -> TR_FUNNEL_CONTROL[1]     = 1
+            3. trFunnelDisInput -> TR_FUNNEL_DIS_INPUT[15:0] = 0
+        TraceRamSink
+            1. trRamActive      -> TR_RAM_CONTROL[0]        = 1
+            2. trRamEnable      -> TR_RAM_CONTROL[1]        = 1
 
-        2. trTeEnable -> TR_TE_CONTROL[1]   = 0 (flushes buffer downstream)
-                                            = 1 (enable) (MUST Be set last after choosing other settings e.g., trTeInstTracing, trTeInstMode)
-        
     Start():
-        3. trTeInstTracing -> TR_TE_CONTROL[2]  = 0 
-                                                = 1 (start tracing) (MUST be set after trTeEnable; this is the last bit to start pushing traces downstream)
-
-        4. Starts emiting traces
+        TraceEncoder
+            1. trTeEnable       -> TR_TE_CONTROL[1]         = 1 (enable) (MUST Be set last after choosing other settings e.g., trTeInstTracing, trTeInstMode)
 
     Stop():
+        TraceEncoder
+            1. trTeEnable       -> TR_TE_CONTROL[1]         = 0 (flushes buffer downstream)
+        TraceFunnel
+            1. trFunnelEnable   -> TR_FUNNEL_CONTROL[1]     = 0
+        TraceRamSink
+            1. trRamEnable      -> TR_RAM_CONTROL[1]        = 0
+
+    Fetch():
+        TraceEncoder
+            Not affected
+        TraceFunnel
+            Not affected
+        TraceRamSink
+            1. !(sinkRamRP == sinkRamWP) read TR_RAM_DATA   4 bytes(1 word) at a time 
+
 
 
 Not modeled:
-    - if downstream stream is already full. Set overflow bit.
+    - if downstream stream is already full. Set overflow bit
 
-
-
+To do:
+    - unordered map to link <addr, value>
 
 
 1. Use shared_ptr for memory management
@@ -43,5 +60,6 @@ Not modeled:
     static constexpr volatile uint32_t TR_TE_CONTROL = 0x00;
 4. should we have to pass TR_TE_BASE, TR_FUNNEL_BASE, TR_RAM_SINK_BASE from tci to trace system during initialization in main()?
     - can we directly specify them inside TraceSystem.hardware
-
 5.  keep the clamping function in TraceEncoder?
+6. Should stop() NOT disable TraceFunnel and TraceRamSink? Since fetch() is called after stop() and buffer should NOT be cleared
+

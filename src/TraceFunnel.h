@@ -95,28 +95,27 @@ namespace tci {
         }
     }
     
-    private:
-    TraceBytesConnect* out = nullptr;
-    
-    std::uint32_t trFunnelControl = 0; // enable = 0 (default)
-    std::uint32_t trFunnelDisInput = 0;
-
     static std::uint32_t normalize_warl_fields(std::uint32_t rw_value) {
         // WARL-lite: clamp fields to legal bitwidth and (optionally) supported subset.
-
+        
         auto clamp_field = [&](std::uint32_t mask, std::uint32_t shift, std::uint32_t max_val) {
             std::uint32_t v = (rw_value & mask) >> shift;
             if (v > max_val) v = max_val; // clamp
             rw_value = (rw_value & ~mask) | ((v << shift) & mask);
         };
-
+        
         // InstMode is 16 bits [15:0] -> legal 0..(2^16-1)
         clamp_field(tci::tr_tf::TR_FUNNEL_DIS_INPUT_MASK,
-                    0,
-                    0xFFFFu);
-
+            0,
+            0xFFFFu);
+            
         return rw_value;
     }
-    
+        
+    private:
+        TraceBytesConnect* out = nullptr;
+        
+        std::uint32_t trFunnelControl = 0; // enable = 0 (default)
+        std::uint32_t trFunnelDisInput = 0;
     };
 }

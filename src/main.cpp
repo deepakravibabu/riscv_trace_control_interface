@@ -16,23 +16,32 @@
 using namespace tci;
 
 int main() {
+    // Instantiate the TraceSystem and TraceControllerInterface
     TraceSystem trSystem;
+    
     tci::TraceControllerInterface trController(trSystem.mmioBus, TraceSystem::TR_TE_BASE, 
         TraceSystem::TR_FUNNEL_BASE, TraceSystem::TR_RAM_SINK_BASE);
 
+    // Configure the trace system via the TraceControllerInterface
     trController.configure();
+
+    // Simulate trace generation by setting TraceEncoder active and emitting some trace data
     trController.start();
+
+    // In a real system, the TraceEncoder would emit trace data based on the execution of instructions.
+    // For this simulation, emitTrace() is called to generate some trace data.
     trSystem.encoder.emitTrace(0x3000, 0xDEADBEEF); // example pc and opcode
     trSystem.encoder.emitTrace(0x3004, 0xCAFEBABE); // another example pc and opcode
 
-    // CHANGE FETCH() - we fetch in bytes or words?
-    std::vector<uint32_t> bytesFetched = trController.fetch(32); // fetch 16 bytes of trace data
-    
-    
+    // Stop the trace system 
     trController.stop();
 
+    // Fetch trace data from TraceRamSink via TraceControllerInterface
+    std::vector<uint32_t> wordsFetched = trController.fetch(4); // fetch trace data n words from TraceRamSink
+    
+    // Print fetched trace data
     std::cout << "Fetched trace data words: ";
-    for (const auto& word : bytesFetched) {
+    for (const auto& word : wordsFetched) {
         std::cout << std::hex << word << " ";
     }
     std::cout << std::dec << std::endl; // reset to decimal
