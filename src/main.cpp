@@ -15,7 +15,7 @@
 
 using namespace tci;
 
-int main(){
+int main() {
     TraceSystem trSystem;
     tci::TraceControllerInterface trController(trSystem.mmioBus, TraceSystem::TR_TE_BASE, 
         TraceSystem::TR_FUNNEL_BASE, TraceSystem::TR_RAM_SINK_BASE);

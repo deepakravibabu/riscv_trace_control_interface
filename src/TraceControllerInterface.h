@@ -14,10 +14,10 @@ namespace tci {
                 : mmioBus(bus), trTeBase(teBase), trFunnelBase(funnelBase), trRamSinkBase(ramSinkBase) {}
 
                 
-                public:
-                static void expectBits(uint32_t got, uint32_t mask, bool should_set){
-                    if(should_set) assert((got & mask) == mask);
-                    else assert((got & mask) == 0);
+    public:
+    static void expectBits(uint32_t got, uint32_t mask, bool should_set) {
+        if(should_set) assert((got & mask) == mask);
+        else assert((got & mask) == 0);
     }
     
     static inline uint32_t bitFieldGet(uint32_t reg, uint32_t mask, uint32_t shift) {
@@ -34,17 +34,16 @@ namespace tci {
         // Configure trEncoderControl:
         // mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, 1);
         // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
-        uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE | tci::tr_te::TR_TE_ENABLE | tci::tr_te::TR_TE_INST_TRACING
-        |                           (0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK;
+        uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE |  tci::tr_te::TR_TE_INST_TRACING | ((0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK);
         mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
         // Assertions to check the write
         uint32_t readBackValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
         expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
-        expectBits(readBackValue, tci::tr_te::TR_TE_ENABLE, true);
+        expectBits(readBackValue, tci::tr_te::TR_TE_INST_TRACING, true);
         // Assertion
         uint32_t readBackFormat = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
         assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
-        
+        // std::cout << "[TraceControllerInterface::configure] TraceEncoder configured with Active, InstTracing enabled and Format set to 0x5" << std::endl;
         
         // Configure trFunnelControl:
         // mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 1);
@@ -55,6 +54,7 @@ namespace tci {
         uint32_t funnelReadBackValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL);
         expectBits(funnelReadBackValue, tci::tr_tf::TR_FUNNEL_ACTIVE, true);
         expectBits(funnelReadBackValue, tci::tr_tf::TR_FUNNEL_ENABLE, true);
+        // std::cout << "[TraceControllerInterface::configure] TraceFunnel configured with Active and Enable set" << std::endl;
 
         // Configure trFunnelDisInput:
         uint32_t trFunnelDisInputValue = ( 0x0u & tci::tr_tf::TR_FUNNEL_DIS_INPUT_MASK); // 0 - enables all inputs to the funnel; 1 - disables
@@ -62,20 +62,42 @@ namespace tci {
         // Assertion to check the write
         uint32_t funnelDisInputReadBackValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_DIS_INPUT);
         assert(bitFieldGet(funnelDisInputReadBackValue, tci::tr_tf::TR_FUNNEL_DIS_INPUT_MASK, 0) == 0x0u);
+        // std::cout << "[TraceControllerInterface::configure] TraceFunnel input enabled (trFunnelDisInput set to 0)" << std::endl;
         
-        // Configure TraceRamSink
-        mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, 1);
+
+        // Configure trRamControl:
+        // mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, 1);
+        uint32_t trRamControlValue = tci::tr_ram::TR_RAM_ACTIVE | tci::tr_ram::TR_RAM_ENABLE;
+        mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, trRamControlValue);
+        // Assertions to check the write
+        uint32_t ramReadBackValue = mmioBus.read32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
+        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ACTIVE, true);
+        expectBits(ramReadBackValue, tci::tr_ram::TR_RAM_ENABLE, true);
+        // std::cout << "[TraceControllerInterface::configure] TraceRamSink configured with Active and Enable set" << std::endl;
+
     }
     
     void start() {
-        // For this simple implementation, configure() already starts the tracing
-        // In a more complex implementation, you might have separate control bits for starting/stopping
+        // Configure trEncoderControl to start producing trace data:
+        // Read-Modify-Write to set the Enable bit while keeping other bits unchanged
+        uint32_t trTeControlValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL) | tci::tr_te::TR_TE_ENABLE;
+        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
+        // Assertions to check the write
+        uint32_t readBackValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        expectBits(readBackValue, tci::tr_te::TR_TE_ENABLE, true);
+        // std::cout << "[TraceControllerInterface::start] Trace production started by enabling TraceEncoder" << std::endl;
+
     }
     
     void stop() {
         // Disable Producer first to stop new data from being generated
         // Disable TraceEncoder
-        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, 0);
+        uint32_t trTeControlValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL) & ~tci::tr_te::TR_TE_ENABLE;
+        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
+        // Assertions to check the write
+        uint32_t readBackValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        expectBits(readBackValue, tci::tr_te::TR_TE_ENABLE, false);
+
         // Disable TraceFunnel
         mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 0);
         // Disable TraceRamSink

@@ -37,13 +37,13 @@ namespace tci {
             }   
         }
 
-        void printDataBuffer() {
-            std::cout << "[TraceRamSink::printDataBuffer] Data buffer contents: ";
-            for (const auto& byte : dataBuffer) {
-                std::cout << std::hex << static_cast<int>(byte) << " ";
-            }
-            std::cout << std::dec << std::endl; // reset to decimal
-        }
+        // void printDataBuffer() {
+        //     std::cout << "[TraceRamSink::printDataBuffer] Data buffer contents: ";
+        //     for (const auto& byte : dataBuffer) {
+        //         std::cout << std::hex << static_cast<int>(byte) << " ";
+        //     }
+        //     std::cout << std::dec << std::endl; // reset to decimal
+        // }
 
         std::uint32_t read32(std::uint32_t offset) override {
             switch (offset) {
@@ -63,17 +63,29 @@ namespace tci {
 
         void write32(std::uint32_t offset, std::uint32_t value) override {
             switch (offset) {
-                case tci::tr_ram::TR_RAM_CONTROL:
-                    if(value == 0) {
-                        trRamControl = value;
+                case tci::tr_ram::TR_RAM_CONTROL: {
+                    const std::uint32_t oldValue = trRamControl;
+
+                    const bool newActive = (value & tci::tr_ram::TR_RAM_ACTIVE) != 0;
+                    if(!newActive) {
+                        trRamControl = 0; // reset all control bits to default values when deactivating
                         resetDataBuffer();
-                    } else if (value == 1) {
-                        trRamControl = value;                    
-                    } else {
-                        std::cout << "[TraceRamSink::write32] Invalid control value: " << value << std::endl;
+                        std::cout << "[TraceRamSink::write32] Trace RAM sinking deactivated, internal state reset, control bits cleared" << std::endl;
                         return;
                     }
+
+                    // Normal masked write
+                    // keep RO bits(EMPTY) as oldValue
+                    const std::uint32_t keep_ro = oldValue & tci::tr_ram::TR_RAM_CONTROL_RO_MASK;
+                    // Take RW bits(ACTIVE, ENABLE, MODE, STOP_ON_WRAP, MEM_FORMAT, ASYNC_FREQ) from new value
+                    std::uint32_t new_rw  = value & tci::tr_ram::TR_RAM_CONTROL_RW_MASK;
+                    
+                    new_rw = normalize_warl_fields(new_rw);
+                    
+                    trRamControl = keep_ro | new_rw;
+
                     break;
+                }
                 case tci::tr_ram::TR_RAM_WP_LOW:
                     // trRamWPLow = value; // ignore writes to WP_LOW
                     break;
@@ -88,6 +100,28 @@ namespace tci {
                     break;
             }
         }
+
+    static std::uint32_t normalize_warl_fields(std::uint32_t rw_value) {
+        // WARL-lite: clamp fields to legal bitwidth and (optionally) supported subset.
+
+        auto clamp_field = [&](std::uint32_t mask, std::uint32_t shift, std::uint32_t max_val) {
+            std::uint32_t v = (rw_value & mask) >> shift;
+            if (v > max_val) v = max_val; // clamp
+            rw_value = (rw_value & ~mask) | ((v << shift) & mask);
+        };
+
+        // trRamMemFormat is 2 bits [10:9] -> legal 0..3
+        clamp_field(tci::tr_ram::TR_RAM_MEM_FORMAT_MASK,
+                    tci::tr_ram::TR_RAM_MEM_FORMAT_SHIFT,
+                    3u);
+
+        // trRamAsyncFreq is 3 bits [14:12] -> legal 0..7
+        clamp_field(tci::tr_ram::TR_RAM_ASYNC_FREQ_MASK,
+                    tci::tr_ram::TR_RAM_ASYNC_FREQ_SHIFT,
+                    7u);
+        
+        return rw_value;
+    }
 
     private:
         uint32_t pop_u32_le() {

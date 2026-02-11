@@ -96,14 +96,14 @@ namespace tci {
                 }
 
                 // 4) If Enable is cleared, it’s reasonable to mark "not tracing" in status
-                if ((trTeControl & tci::tr_te::TR_TE_ENABLE) == 0) {
-                    trTeControl &= ~tci::tr_te::TR_TE_INST_TRACING;
-                }
+                // if ((trTeControl & tci::tr_te::TR_TE_ENABLE) == 0) {
+                //     trTeControl &= ~tci::tr_te::TR_TE_INST_TRACING;
+                // }
 
                 // 5) If Active is set (released reset), Empty should usually be 1 until data is emitted
-                if (newActive && !(trTeControl & tci::tr_te::TR_TE_INST_TRACING)) {
-                    trTeControl |= tci::tr_te::TR_TE_EMPTY;
-                }
+                // if (newActive && !(trTeControl & tci::tr_te::TR_TE_INST_TRACING)) {
+                //     trTeControl |= tci::tr_te::TR_TE_EMPTY;
+                // }
 
                 break;
             }
