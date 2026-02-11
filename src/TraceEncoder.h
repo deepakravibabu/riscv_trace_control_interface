@@ -24,18 +24,18 @@ namespace tci {
         out = connector;
     }
     
-    void emitInstr(std::uint32_t pc, std::uint32_t opcode) {
+    void emitTrace(std::uint32_t pc, std::uint32_t opcode) {
         const bool active = (trTeControl & tci::tr_te::TR_TE_ACTIVE) != 0;
         const bool enable = (trTeControl & tci::tr_te::TR_TE_ENABLE) != 0;
         const bool tracing = (trTeControl & tci::tr_te::TR_TE_INST_TRACING) != 0;
         
         if(!active || !enable || !tracing) {
-            std::cout << "[TraceEncoder::emitInstr] Trace encoding is inactive or disabled or not tracing, skipping instruction emission" << std::endl;
+            std::cout << "[TraceEncoder::emitTrace] Trace encoding is inactive or disabled or not tracing, skipping instruction emission" << std::endl;
             return;
         }
     
         if (!out) {
-            std::cout << "[TraceEncoder::emitInstr] No out set" << std::endl;
+            std::cout << "[TraceEncoder::emitTrace] No out set" << std::endl;
             return;
         }
         
@@ -47,7 +47,7 @@ namespace tci {
         // Status: once we emit something, it is not empty anymore
         trTeControl &= ~tci::tr_te::TR_TE_EMPTY;
         
-        std::cout << "[TraceEncoder::emitInstr] buffer filled with pc and opcode" << std::endl;
+        std::cout << "[TraceEncoder::emitTrace] buffer filled with pc and opcode" << std::endl;
         
         out->pushBytes(buffer);
     }

@@ -31,13 +31,12 @@ namespace tci {
     
     
     void configure() {
-        // Enable TraceEncoder
+        // Configure trEncoderControl:
         // mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, 1);
         // enable trTeActive and trTeEnable, set trTeFormat to 0 (default)
-        uint32_t teControlValue = tci::tr_te::TR_TE_ACTIVE | tci::tr_te::TR_TE_ENABLE | tci::tr_te::TR_TE_INST_TRACING
-        | (0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK;
-        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, teControlValue);
-        
+        uint32_t trTeControlValue = tci::tr_te::TR_TE_ACTIVE | tci::tr_te::TR_TE_ENABLE | tci::tr_te::TR_TE_INST_TRACING
+        |                           (0x5u << tci::tr_te::TR_TE_FORMAT_SHIFT) & tci::tr_te::TR_TE_FORMAT_MASK;
+        mmioBus.write32(trTeBase + tci::tr_te::TR_TE_CONTROL, trTeControlValue);
         // Assertions to check the write
         uint32_t readBackValue = mmioBus.read32(trTeBase + tci::tr_te::TR_TE_CONTROL);
         expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
@@ -47,10 +46,24 @@ namespace tci {
         assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
         
         
-        // Enable TraceFunnel
-        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 1);
-        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_DIS_INPUT, 1); // enable funnel input
-        // Enable TraceRamSink
+        // Configure trFunnelControl:
+        // mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, 1);
+        // mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_DIS_INPUT, 1); // enable funnel input
+        uint32_t trFunnelControlValue = tci::tr_tf::TR_FUNNEL_ACTIVE | tci::tr_tf::TR_FUNNEL_ENABLE;
+        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL, trFunnelControlValue);
+        // Assertions to check the write
+        uint32_t funnelReadBackValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_CONTROL);
+        expectBits(funnelReadBackValue, tci::tr_tf::TR_FUNNEL_ACTIVE, true);
+        expectBits(funnelReadBackValue, tci::tr_tf::TR_FUNNEL_ENABLE, true);
+
+        // Configure trFunnelDisInput:
+        uint32_t trFunnelDisInputValue = ( 0x0u & tci::tr_tf::TR_FUNNEL_DIS_INPUT_MASK); // 0 - enables all inputs to the funnel; 1 - disables
+        mmioBus.write32(trFunnelBase + tci::tr_tf::TR_FUNNEL_DIS_INPUT, trFunnelDisInputValue);
+        // Assertion to check the write
+        uint32_t funnelDisInputReadBackValue = mmioBus.read32(trFunnelBase + tci::tr_tf::TR_FUNNEL_DIS_INPUT);
+        assert(bitFieldGet(funnelDisInputReadBackValue, tci::tr_tf::TR_FUNNEL_DIS_INPUT_MASK, 0) == 0x0u);
+        
+        // Configure TraceRamSink
         mmioBus.write32(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL, 1);
     }
     

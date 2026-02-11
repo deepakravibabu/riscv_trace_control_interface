@@ -22,8 +22,8 @@ int main(){
 
     trController.configure();
     trController.start();
-    trSystem.encoder.emitInstr(0x2000, 0xDEADBEEF); // example pc and opcode
-    trSystem.encoder.emitInstr(0x2004, 0xCAFEBABE); // another example pc and opcode
+    trSystem.encoder.emitTrace(0x3000, 0xDEADBEEF); // example pc and opcode
+    trSystem.encoder.emitTrace(0x3004, 0xCAFEBABE); // another example pc and opcode
 
     // CHANGE FETCH() - we fetch in bytes or words?
     std::vector<uint32_t> bytesFetched = trController.fetch(32); // fetch 16 bytes of trace data
