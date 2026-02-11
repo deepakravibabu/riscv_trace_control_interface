@@ -1,9 +1,9 @@
 /*
     With VSCode, if you like to use CMake, the project can be built with the following command. 
     <PowerShell terminal>
-        PS D:\Project\riscv_trace_control_interface\build> cmake -S .. -B .
-        MSBuild.exe .\tci.vcxproj
-    It builds the project and the .exe file is found under ./Debug/tci.exe
+        PS D:\Project\riscv_trace_control_interface> cmake -S . -B .\build\
+        MSBuild.exe .\build\tci.vcxproj
+        .\build\Debug\tci.exe
 */
 
 

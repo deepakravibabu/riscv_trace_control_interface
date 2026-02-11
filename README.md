@@ -69,6 +69,40 @@ Retrieves stored data from the Sink.
 
 <!-- ![Alt Text](./doc/riscv_tci_block_diagram.drawio.png) -->
 
+## Building and Running
+
+### Prerequisites
+* **CMake** (version 3.22.2 or higher)
+* A C++17 compatible compiler (GCC, Clang, or MSVC)
+
+### 🐧 Linux & macOS
+```bash
+# Generate build files
+mkdir build
+cmake -S . -B ./build/
+
+# Compile the project
+cmake --build build
+
+# Run the executable
+./build/tci
+
+```
+
+### VS Code
+```bash
+# Inside Powershell Terminal
+# Generate build files 
+cmake -S . -B .\build\
+
+# Compile the project
+MSBuild.exe .\build\tci.vcxproj
+
+# Run the executable
+.\build\Debug\tci.exe
+
+```
+
 <p align="center">
   <img src="./doc/riscv_tci_block_diagram.drawio.png" alt="Trace Controller Interface Block Diagram" width="900">
 </p>
