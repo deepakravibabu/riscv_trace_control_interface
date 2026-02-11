@@ -7,19 +7,26 @@
 */
 
 
-#include "TraceSystem.h"
-#include "TraceControllerInterface.h"
 #include <iostream>
 #include <vector>
 #include <cstdint>
+
+#include "TraceSystem.h"
+#include "TraceControllerInterface.h"
+#include "ProbeHwAccess.h"
+
 
 using namespace tci;
 
 int main() {
     // Instantiate the TraceSystem and TraceControllerInterface
     TraceSystem trSystem;
-    
-    tci::TraceControllerInterface trController(trSystem.mmioBus, TraceSystem::TR_TE_BASE, 
+
+    // Create a ProbeHwAccess that uses the TraceSystem's MMIO bus
+    ProbeHwAccess probeAccess(trSystem.mmioBus);
+
+    // TraceControllerInterface takes the probe access(ReadMemory and WriteMemory stubs) and the base addresses of the components
+    tci::TraceControllerInterface trController(probeAccess, TraceSystem::TR_TE_BASE, 
         TraceSystem::TR_FUNNEL_BASE, TraceSystem::TR_RAM_SINK_BASE);
 
     // Configure the trace system via the TraceControllerInterface

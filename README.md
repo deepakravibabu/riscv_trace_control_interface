@@ -66,3 +66,9 @@ Retrieves stored data from the Sink.
 
 ### Requirements
 * A target environment supporting `ReadMemory` and `WriteMemory` hooks.
+
+<!-- ![Alt Text](./doc/riscv_tci_block_diagram.drawio.png) -->
+
+<p align="center">
+  <img src="./doc/riscv_tci_block_diagram.drawio.png" alt="Trace Controller Interface Block Diagram" width="600">
+</p>
