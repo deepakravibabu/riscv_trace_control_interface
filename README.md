@@ -70,5 +70,5 @@ Retrieves stored data from the Sink.
 <!-- ![Alt Text](./doc/riscv_tci_block_diagram.drawio.png) -->
 
 <p align="center">
-  <img src="./doc/riscv_tci_block_diagram.drawio.png" alt="Trace Controller Interface Block Diagram" width="600">
+  <img src="./doc/riscv_tci_block_diagram.drawio.png" alt="Trace Controller Interface Block Diagram" width="900">
 </p>
