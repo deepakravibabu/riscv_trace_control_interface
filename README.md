@@ -75,7 +75,7 @@ Retrieves stored data from the Sink.
 * **CMake** (version 3.22.2 or higher)
 * A C++17 compatible compiler (GCC, Clang, or MSVC)
 
-### 🐧 Linux & macOS
+### Linux & macOS
 ```bash
 # Generate build files
 mkdir build
@@ -110,7 +110,7 @@ MSBuild.exe .\build\tci_demo.vcxproj
 .\build\Debug\tci_demo.exe
 ```
 
-### Expected Output - Debug Mode
+### Expected Output - 'tci_demo' executable
 #### Assertions are done after write so there is a extra READ operation by probe
 ```text
 
