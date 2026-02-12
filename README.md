@@ -79,28 +79,35 @@ Retrieves stored data from the Sink.
 ```bash
 # Generate build files
 mkdir build
-cmake -S . -B ./build/
-
+# Set GoogleTests OFF and Build 'tci_demo' executable
+cmake -S . -B ./build/ -DTCI_BUILD_GTESTS=OFF
 # Compile the project
-cmake --build build
-
+cmake --build ./build/ --target tci_demo
 # Run the executable
-./build/tci
-
+./build/Debug/tci_demo
 ```
+
+```bash
+# Generate build files
+mkdir build
+# Set GoogleTests ON and Build 'tci_demo' and 'tci_gtests' executables
+cmake -S . -B ./build/ -DTCI_BUILD_GTESTS=ON
+# Compile the project
+cmake --build ./build/ --target tci_demo
+cmake --build ./build/ --target tci_gtests
+# Run the executable
+./build/Debug/tci_demo
+./build/Debug/tci_gtests
+```
+
 
 ### VS Code
 ```bash
 # Inside Powershell Terminal
-# Generate build files 
-cmake -S . -B .\build\
-
-# Compile the project
-MSBuild.exe .\build\tci.vcxproj
-
-# Run the executable
-.\build\Debug\tci.exe
-
+cmake -S . -B .\build\ -DTCI_BUILD_GTESTS=OFF
+# Compile the project (similar to cmake --build)
+MSBuild.exe .\build\tci_demo.vcxproj
+.\build\Debug\tci_demo.exe
 ```
 
 ### Expected Output - Debug Mode
