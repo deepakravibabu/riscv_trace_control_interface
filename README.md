@@ -103,8 +103,8 @@ MSBuild.exe .\build\tci.vcxproj
 
 ```
 
-### Expected Output
-# Assertions are done after write so there is a extra READ operation by probe
+### Expected Output - Debug Mode
+#### Assertions are done after write so there is a extra READ operation by probe
 ```text
 
  Configuring Trace System... 
