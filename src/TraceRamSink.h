@@ -11,7 +11,8 @@
 namespace tci {
     class TraceRamSink : public TraceBytesConnect, public IMmioDevice {
     public:
-    TraceRamSink(std::size_t bufferSize = 32) : dataBuffer(bufferSize, 0) {
+    TraceRamSink(std::uint32_t bufSize) : bufferSize(bufSize) {
+        dataBuffer.resize(bufferSize, 0);
         trRamControl = 0; // default control value with all bits cleared
         set_empty(true); // initially empty
     }
@@ -208,6 +209,7 @@ namespace tci {
     private:
     std::uint32_t trRamControl = 0; // enable = 0 (default)
     std::vector<std::uint8_t> dataBuffer;
+    std::uint32_t bufferSize = 1024; // default buffer size in bytes (256 words)
 
     std::uint32_t count = 0;
 
@@ -215,7 +217,6 @@ namespace tci {
     std::uint32_t wp_byte = 0;
     std::uint32_t rp_byte = 0;
 
-    // Debug/telemetry (optional)
     std::uint32_t dropped_bytes = 0;
 
     };

@@ -103,6 +103,71 @@ MSBuild.exe .\build\tci.vcxproj
 
 ```
 
+### Expected Output
+# Assertions are done after write so there is a extra READ operation by probe
+```text
+
+ Configuring Trace System... 
+[PROBE WRITE]TraceRamSink + 0x000 (TR_RAM_CONTROL) <= 0x3
+[PROBE READ]TraceRamSink + 0x000 (TR_RAM_CONTROL) => 0xb
+[PROBE WRITE]TraceFunnel + 0x000 (TR_FUNNEL_CONTROL) <= 0x3
+[PROBE READ]TraceFunnel + 0x000 (TR_FUNNEL_CONTROL) => 0x3
+[PROBE WRITE]TraceFunnel + 0x008 (TR_FUNNEL_DIS_INPUT) <= 0x0
+[PROBE READ]TraceFunnel + 0x008 (TR_FUNNEL_DIS_INPUT) => 0x0
+[PROBE WRITE]TraceEncoder + 0x000 (TR_TE_CONTROL) <= 0x5000005
+[PROBE READ]TraceEncoder + 0x000 (TR_TE_CONTROL) => 0x5000005
+
+ Starting Trace System...
+[PROBE READ]TraceEncoder + 0x000 (TR_TE_CONTROL) => 0x5000005
+[PROBE WRITE]TraceEncoder + 0x000 (TR_TE_CONTROL) <= 0x5000007
+[PROBE READ]TraceEncoder + 0x000 (TR_TE_CONTROL) => 0x5000007
+
+ Stopping Trace System...
+[PROBE READ]TraceEncoder + 0x000 (TR_TE_CONTROL) => 0x5000007
+[PROBE WRITE]TraceEncoder + 0x000 (TR_TE_CONTROL) <= 0x5000005
+[PROBE READ]TraceEncoder + 0x000 (TR_TE_CONTROL) => 0x5000005
+[PROBE READ]TraceFunnel + 0x000 (TR_FUNNEL_CONTROL) => 0x3
+[PROBE WRITE]TraceFunnel + 0x000 (TR_FUNNEL_CONTROL) <= 0x1
+[PROBE READ]TraceFunnel + 0x000 (TR_FUNNEL_CONTROL) => 0x1
+[PROBE READ]TraceRamSink + 0x000 (TR_RAM_CONTROL) => 0x3
+[PROBE WRITE]TraceRamSink + 0x000 (TR_RAM_CONTROL) <= 0x1
+[PROBE READ]TraceRamSink + 0x000 (TR_RAM_CONTROL) => 0x1
+
+ Fetching trace data from TraceRamSink (size: 10 words)...
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x0
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0x3000
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x4
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0xdeadbeef
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x8
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0x3004
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0xc
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0xcafebabe
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x10
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0x3008
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x14
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0xaafe1000
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x18
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0x300c
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x1c
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x040 (TR_RAM_DATA) => 0xbafe1004
+[PROBE READ]TraceRamSink + 0x028 (TR_RAM_RP_LOW) => 0x20
+[PROBE READ]TraceRamSink + 0x020 (TR_RAM_WP_LOW) => 0x20
+
+ Fetched trace data words: 3000 deadbeef 3004 cafebabe 3008 aafe1000 300c bafe1004 
+
+ Main function finished execution
+
+[Done] exited with code=0 in 0.724 seconds
+```
+
 <p align="center">
   <img src="./doc/riscv_tci_block_diagram.drawio.png" alt="Trace Controller Interface Block Diagram" width="900">
 </p>

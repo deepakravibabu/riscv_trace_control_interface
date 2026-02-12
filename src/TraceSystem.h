@@ -13,13 +13,14 @@ class TraceSystem {
     static constexpr uint32_t TR_FUNNEL_BASE = 0x2000;
     static constexpr uint32_t TR_RAM_SINK_BASE = 0x3000;
     static constexpr uint32_t COMPONENT_SIZE = 0x1000; // 4 KB
-
-    tci::TraceEncoder encoder;
-    tci::TraceFunnel funnel;
-    tci::TraceRamSink sink;
-    tci::MmioBus mmioBus;
-
-    TraceSystem() {
+    
+    TraceSystem(std::uint32_t sinkRamBufferSize) : 
+        sinkRamBufferSize(sinkRamBufferSize),         
+        encoder(),
+        funnel(),
+        sink(sinkRamBufferSize),
+        mmioBus()
+    {
         // Connect the components
         encoder.connect(&funnel);
         funnel.connect(&sink);
@@ -29,4 +30,19 @@ class TraceSystem {
         mmioBus.addMapping(TR_FUNNEL_BASE, COMPONENT_SIZE, &funnel); // TraceFunnel at 0x2000 - 0x2FFF
         mmioBus.addMapping(TR_RAM_SINK_BASE, COMPONENT_SIZE, &sink); // TraceRamSink at 0x3000 - 0x3FFF
     }
+
+    public:
+    void emitTrace(std::uint32_t pc, std::uint32_t opcode) {
+        encoder.emitTrace(pc, opcode);
+    }
+
+    public:
+    tci::MmioBus mmioBus;
+    
+    private:
+    std::uint32_t sinkRamBufferSize; // default buffer size for TraceRamSink in bytes
+    tci::TraceEncoder encoder;
+    tci::TraceFunnel funnel;
+    tci::TraceRamSink sink;
+
 };

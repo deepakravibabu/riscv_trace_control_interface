@@ -67,8 +67,8 @@ namespace tci {
         uint32_t readBackValue = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
         expectBits(readBackValue, tci::tr_te::TR_TE_ACTIVE, true);
         expectBits(readBackValue, tci::tr_te::TR_TE_INST_TRACING, true);
-        uint32_t readBackFormat = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
-        assert(bitFieldGet(readBackFormat, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
+        // uint32_t readBackFormat = hw_.ReadMemory(trTeBase + tci::tr_te::TR_TE_CONTROL);
+        assert(bitFieldGet(readBackValue, tci::tr_te::TR_TE_FORMAT_MASK, tci::tr_te::TR_TE_FORMAT_SHIFT) == 0x5u);
         // std::cout << "[TraceControllerInterface::configure] TraceEncoder configured with Active, InstTracing enabled and Format set to 0x5" << std::endl;
 
     }
@@ -120,13 +120,12 @@ namespace tci {
             std::uint32_t sinkDataBufferValue = hw_.ReadMemory(trRamSinkBase + tci::tr_ram::TR_RAM_DATA); // advances rp by 4 bytes.  Read from TraceRamSink to see the data
             data.push_back(sinkDataBufferValue);
 
-            const std::uint32_t ctrl = hw_.ReadMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
-            const bool empty = (ctrl & tci::tr_ram::TR_RAM_EMPTY) != 0;
-            if(empty) break; // no more data available
+            // const std::uint32_t ctrl = hw_.ReadMemory(trRamSinkBase + tci::tr_ram::TR_RAM_CONTROL);
+            // const bool empty = (ctrl & tci::tr_ram::TR_RAM_EMPTY) != 0;
+            // if(empty) break; // no more data available
         }
         return data;
     }
-
 
     private:
         IHwAccess& hw_;
