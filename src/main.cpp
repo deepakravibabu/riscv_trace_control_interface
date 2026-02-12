@@ -6,6 +6,19 @@
         .\build\Debug\tci.exe
 */
 
+/* 
+    Bash Terminal
+        Set GoogleTests OFF and Build 'tci_demo' exec
+        cmake -S . -B build -DTCI_BUILD_GTESTS=OFF
+        cmake --build build --target tci_demo
+        ./build/Debug/tci_demo
+
+        Set GoogleTests ON - Built both executables
+        cmake -S . -B build -DTCI_BUILD_GTESTS=ON
+        cmake --build build --target tci_demo
+        cmake --build build --target tci_gtests
+        ./build/Debug/tci_gtests
+*/
 
 #include <iostream>
 #include <vector>
