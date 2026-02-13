@@ -27,15 +27,18 @@ The controller sequences operations through four primary stages:
 ### 1. Configure
 Sets up the hardware path. Components must be activated before specific feature bits are applied.
 
-| Component | Register Field | Value | Requirement |
-| :--- | :--- | :--- | :--- |
-| **TraceEncoder** | `TR_TE_CONTROL[0]` | `1` | **Active**: Write 1 and read back to verify. |
-| | `TR_TE_CONTROL[2]` | `1` | **InstTracing**: Must be set before Enable. |
-| **TraceFunnel** | `TR_FUNNEL_CONTROL[0]`| `1` | **Active** |
-| | `TR_FUNNEL_CONTROL[1]`| `1` | **Enable** |
-| | `TR_FUNNEL_DIS_INPUT` | `0` | **Disable Input**: Set bits [15:0] to 0. |
-| **TraceRamSink** | `TR_RAM_CONTROL[0]`   | `1` | **Active** |
-| | `TR_RAM_CONTROL[1]`   | `1` | **Enable** |
+| Component | Register Field | Internal Name | Value | Requirement / Note |
+| :--- | :--- | :--- | :--- | :--- |
+| **TraceRamSink** | `TR_RAM_CONTROL[0]` | `TR_RAM_ACTIVE` | `1` | **Active** |
+| | `TR_RAM_CONTROL[1]` | `TR_RAM_ENABLE` | `1` | **Enable** |
+| **TraceFunnel** | `TR_FUNNEL_CONTROL[0]`| `trFunnelActive` | `1` | **Active** |
+| | `TR_FUNNEL_CONTROL[1]` | `trFunnelEnable` | `1` | **Enable** |
+| | `TR_FUNNEL_DIS_INPUT` | `trFunnelDisInput[15:0]`| `0` | **Disable Input**: Set bits [15:0] to 0. |
+| **TraceEncoder** | `TR_TE_CONTROL[0]` | `trTeActive` | `1` | **Active**: Write 1 and read back to verify. |
+| | `TR_TE_CONTROL[2]` | `trTeInstTracing` | `1` | **InstTracing**: Must be set before Enable. |
+| | `TR_TE_CONTROL[6:4]` | `trTeInstMode` | `3` | **InstMode**: Baseline instruction trace. |
+| | `TR_TE_CONTROL[26:24]` | `trTeFormat` | `5` | **Format**: Custom mode. |
+| | `TR_TE_CONTROL[17:16]` | `trTeInstSyncMode` | `3` | **SyncMode**: Custom mode. |
 
 ### 2. Start
 Activates the tracing stream.

@@ -64,14 +64,15 @@ int main() {
     trSystem.emitTrace(0x3004, 0xCAFEBABE); // another example pc and opcode
     trSystem.emitTrace(0x3008, 0xAAFE1000); // another example pc and opcode
     trSystem.emitTrace(0x300C, 0xBAFE1004); // another example pc and opcode
-
+    trSystem.emitTrace(0x3010, 0xEA0E1539); // another example pc and opcode
+    trSystem.emitTrace(0x3014, 0x4A2E433D); // another example pc and opcode
 
     // Stop the trace system 
     std::cout << "\n Stopping Trace System..." << std::endl;
     trController.stop();
 
     // Fetch trace data from TraceRamSink via TraceControllerInterface
-    std::uint32_t numfetchWords = 10; // number of 32-bit words to fetch from TraceRamSink
+    std::uint32_t numfetchWords = 20; // number of 32-bit words to fetch from TraceRamSink
     std::cout << "\n Fetching trace data from TraceRamSink (size: " << numfetchWords << " words)..." << std::endl;
     std::vector<uint32_t> wordsFetched = trController.fetch(numfetchWords); // fetch trace data n words from TraceRamSink
     

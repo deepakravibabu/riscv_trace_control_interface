@@ -13,16 +13,19 @@ Modeled:
 
 TraceEncoder
     Configure():
-        TraceEncoder
-            1. trTeActive       -> TR_TE_CONTROL[0]         = 1 (active) (write 1 and read back to see if it is 1 then, start config)
-            2. trTeInstTracing  -> TR_TE_CONTROL[2]         = 1 (start tracing) (MUST be set before trTeEnable)
+        TraceRamSink
+            1. trRamActive      -> TR_RAM_CONTROL[0]        = 1
+            2. trRamEnable      -> TR_RAM_CONTROL[1]        = 1
         TraceFunnel
             1. trFunnelActive   -> TR_FUNNEL_CONTROL[0]     = 1
             2. trFunnelEnable   -> TR_FUNNEL_CONTROL[1]     = 1
             3. trFunnelDisInput -> TR_FUNNEL_DIS_INPUT[15:0] = 0
-        TraceRamSink
-            1. trRamActive      -> TR_RAM_CONTROL[0]        = 1
-            2. trRamEnable      -> TR_RAM_CONTROL[1]        = 1
+        TraceEncoder
+            1. trTeActive       -> TR_TE_CONTROL[0]         = 1 (active) (write 1 and read back to see if it is 1 then, start config)
+            2. trTeInstTracing  -> TR_TE_CONTROL[2]         = 1 (start tracing) (MUST be set before trTeEnable)
+            3. trTeInstMode     -> TR_TE_CONTROL[6:4]       = 3 (baseline instruction trace)
+            4. trTeFormat       -> TR_TE_CONTROL[26:24]     = 5 (custom trace format)
+            5. trTeInstSyncMode -> TR_TE_CONTROL[17:16]     = 1 (custom)
 
     Start():
         TraceEncoder

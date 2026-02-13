@@ -14,11 +14,11 @@ namespace tci {
     class MmioBus {
         public:
         void addMapping(uint32_t baseAddress, uint32_t size, IMmioDevice* device) {
-            mappings.push_back({baseAddress, size, device});
+            mappings_.push_back({baseAddress, size, device});
         }
         
         uint32_t read32(uint32_t address) {
-            for (const auto& mapping : mappings) {
+            for (const auto& mapping : mappings_) {
                 if (address >= mapping.baseAddress && address < mapping.baseAddress + mapping.size) {
                     return mapping.device->read32(address - mapping.baseAddress);
                 }
@@ -27,7 +27,7 @@ namespace tci {
         }
         
         void write32(uint32_t address, uint32_t value) {
-            for (const auto& mapping : mappings) {
+            for (const auto& mapping : mappings_) {
                 if (address >= mapping.baseAddress && address < mapping.baseAddress + mapping.size) {
                     mapping.device->write32(address - mapping.baseAddress, value); // global to local offset
                     return;
@@ -37,6 +37,6 @@ namespace tci {
         }
 
         private:
-        std::vector<MmioMapping> mappings;
+        std::vector<MmioMapping> mappings_;
     };
 }
